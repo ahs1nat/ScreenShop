@@ -5,6 +5,7 @@ import cors from "cors";
 import dotenv from "dotenv"
 import productRoutes from "./routes/productRoutes.js";
 import { sql } from "./config/db.js";
+import { initDB } from "./config/init.js";
 
 dotenv.config();
 
@@ -21,27 +22,26 @@ app.get("/test", (req, res) => {
     res.send("Hello from  finally " + PORT);
 });
 
-app.use("/api/products", productRoutes);
+app.use("/api/products", productRoutes); 
 
-
-async function initDB() {
-    try {
-        await sql`
-      CREATE TABLE IF NOT EXISTS users (
-        user_id SERIAL PRIMARY KEY,
-        name VARCHAR(100) NOT NULL,
-        email VARCHAR(150) NOT NULL UNIQUE,
-        password_hash VARCHAR(255) NOT NULL,
-        role VARCHAR(20) NOT NULL CHECK (role IN ('buyer', 'seller')),
-        created_at TIMESTAMP DEFAULT NOW()
-      );
-    `;
-        console.log("DB init success");
-    } catch (error) {
-        console.log("Error initDB: ", error);
-        process.exit(1);
-    }
-}
+// async function initDB() {
+//     try {
+//         await sql`
+//       CREATE TABLE IF NOT EXISTS users (
+//         user_id SERIAL PRIMARY KEY,
+//         name VARCHAR(100) NOT NULL,
+//         email VARCHAR(150) NOT NULL UNIQUE,
+//         password_hash VARCHAR(255) NOT NULL,
+//         role VARCHAR(20) NOT NULL CHECK (role IN ('buyer', 'seller')),
+//         created_at TIMESTAMP DEFAULT NOW()
+//       );
+//     `;
+//         console.log("DB init success");
+//     } catch (error) {
+//         console.log("Error initDB: ", error);
+//         process.exit(1);
+//     }
+// }
 // (req,res) =>{
 //     // get all products from database
 
@@ -55,9 +55,9 @@ async function initDB() {
 //     });
 // });
 
-// app.listen(PORT, () => {
-//     console.log("Server is running on port " + PORT);
-// });
+app.listen(PORT, () => {
+    console.log("Server is running on port " + PORT);
+});
 
 initDB().then(() => {
     app.listen(PORT, () => {
