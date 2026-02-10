@@ -2,9 +2,17 @@ import express from "express";
 import helmet from "helmet";
 import morgan from "morgan";
 import cors from "cors";
-import dotenv from "dotenv"
+import dotenv from "dotenv"; //loads secret variables(passwords) from .env
+
+//routes
 import productRoutes from "./routes/productRoutes.js";
-import { sql } from "./config/db.js";
+import authRoutes from "./routes/authRoutes.js";
+
+
+//import { sql } from "./config/db.js";
+
+import { initDB } from "./config/init.js";
+import { seed } from "./routes/seed.js";
 
 dotenv.config();
 
@@ -13,35 +21,63 @@ const PORT = process.env.PORT || 3000;
 
 console.log(PORT);
 
-app.use(express.json());
-app.use(cors());
+//middlewares
+app.use(express.json()); //extract json data
+//app.use(express.urlencoded({ extended: true }));
+//express to automatically post data in html form submissions so that it cant be accessed in req.body
+
+app.use(cors()); //allows react to talk to backend
 app.use(helmet()); // helmet = security middleware
 app.use(morgan("dev")); // log the requests
+
+
 app.get("/test", (req, res) => {
-    res.send("Hello from  finally " + PORT);
+  res.send("Hello from " + PORT);
 });
 
+app.set("json spaces", 2);
 app.use("/api/products", productRoutes);
+//api/products diye start howa shob request productRoutes.js file handle korbe
 
+app.use("/api/auth", authRoutes);
 
-async function initDB() {
-    try {
-        await sql`
-      CREATE TABLE IF NOT EXISTS users (
-        user_id SERIAL PRIMARY KEY,
-        name VARCHAR(100) NOT NULL,
-        email VARCHAR(150) NOT NULL UNIQUE,
-        password_hash VARCHAR(255) NOT NULL,
-        role VARCHAR(20) NOT NULL CHECK (role IN ('buyer', 'seller')),
-        created_at TIMESTAMP DEFAULT NOW()
-      );
-    `;
-        console.log("DB init success");
-    } catch (error) {
-        console.log("Error initDB: ", error);
-        process.exit(1);
-    }
+async function startServer() {
+  try { 
+    await initDB();
+    console.log("Database Tables Initialized");
+
+    await seed();
+    console.log("Database Seeded Successfully");
+  
+    app.listen(PORT, () => {
+      console.log(`Server is running on http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error("Critical Startup Error:", error.message);
+    process.exit(1);
+  }
 }
+
+startServer();
+
+// async function initDB() {
+//     try {
+//         await sql`
+//       CREATE TABLE IF NOT EXISTS users (
+//         user_id SERIAL PRIMARY KEY,
+//         name VARCHAR(100) NOT NULL,
+//         email VARCHAR(150) NOT NULL UNIQUE,
+//         password_hash VARCHAR(255) NOT NULL,
+//         role VARCHAR(20) NOT NULL CHECK (role IN ('buyer', 'seller')),
+//         created_at TIMESTAMP DEFAULT NOW()
+//       );
+//     `;
+//         console.log("DB init success");
+//     } catch (error) {
+//         console.log("Error initDB: ", error);
+//         process.exit(1);
+//     }
+// }
 // (req,res) =>{
 //     // get all products from database
 
@@ -59,8 +95,23 @@ async function initDB() {
 //     console.log("Server is running on port " + PORT);
 // });
 
-initDB().then(() => {
-    app.listen(PORT, () => {
-        console.log("Server is running on port " + PORT);
-    });
-});
+// initDB().then(() => {
+//     app.listen(PORT, () => {
+//         console.log("Server is running on port " + PORT);
+//     });
+//     seed();
+// });
+
+// Request comes in from React.
+
+// Morgan logs it in your console.
+
+// Helmet adds security headers.
+
+// Express.json reads any data sent.
+
+// Router looks at the URL and sends it to productRoutes.js.
+
+// ProductRoutes talks to PostgreSQL to get data.
+
+// Response is sent back to React.

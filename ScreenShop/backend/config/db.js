@@ -1,15 +1,16 @@
 import { neon } from "@neondatabase/serverless";
 import dotenv from "dotenv";
 
+//reads .env file and puts the variables into process.env
 dotenv.config();
 
-const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
+//process is a global node.js object
+//process.env is the object containing env variables
 
-// creates a SQL connection using our env variables
-export const sql = neon(
-  `postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}?sslmode=require&channel_binding=require`
-);
+//debug line
+if (!process.env.DATABASE_URL) {
+  console.error("DATABASE_URL is missing from .env file");
+}
 
-// this sql function we export is used as a tagged template literal, which allows us to write SQL queries safely
-
-//postgresql://neondb_owner:npg_fYEuGdg20lPb@ep-proud-voice-a8dq4a35-pooler.eastus2.azure.neon.tech/neondb?sslmode=require&channel_binding=require
+//neon() returns a sql function which is used to run sql queries
+export const sql = neon(process.env.DATABASE_URL);
