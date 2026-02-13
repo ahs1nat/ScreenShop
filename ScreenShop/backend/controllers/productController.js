@@ -6,7 +6,7 @@ export const getAllProducts = async (req, res) => {
       SELECT p.*, c.name as category_name 
       FROM products p
       LEFT JOIN product_category c ON p.category_id = c.category_id
-      WHERE p.approved=true
+      WHERE p.approved=false
       ORDER BY p.created_at DESC
     `;
     res.status(200).json({ success: true, data: products });
