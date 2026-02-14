@@ -5,7 +5,7 @@ dotenv.config();
 
 export async function seed() {
   try {
-    console.log("🌱 Starting database seed...");
+    console.log("Starting database seed...");
 
     // 1. Clear existing data
     await sql`TRUNCATE TABLE users, sellers, buyers, products, product_category RESTART IDENTITY CASCADE`;
@@ -22,7 +22,7 @@ export async function seed() {
     const [accessories] =
       await sql`INSERT INTO product_category (name) VALUES ('Accessories') RETURNING category_id`;
 
-    console.log(`👤 Created User with ID: ${user.user_id}`);
+    console.log(`Created User with ID: ${user.user_id}`);
 
     // 3. Create the Seller record (linking it to the User)
     // This satisfies the 1:1 relationship where seller_id = user_id
@@ -32,7 +32,7 @@ export async function seed() {
       RETURNING seller_id
     `;
 
-    console.log(`🏪 Created Seller with ID: ${seller.seller_id}`);
+    console.log(`Created Seller with ID: ${seller.seller_id}`);
 
     // 4. Insert Product Data
     const products = [

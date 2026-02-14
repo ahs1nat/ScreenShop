@@ -7,15 +7,17 @@ export async function createCartitemTable() {
     cartitem_id SERIAL PRIMARY KEY,
         buyer_id INT NOT NULL,
         product_id INT NOT NULL,
-        quantity INT NOT NULL,
+        quantity INT NOT NULL CHECK (quantity > 0),
 
         CONSTRAINT fk_cart_buyer
           FOREIGN KEY (buyer_id)
-          REFERENCES buyers(buyer_id),
+          REFERENCES buyers(buyer_id)
+          ON DELETE CASCADE,
 
         CONSTRAINT fk_cart_product
           FOREIGN KEY (product_id)
-          REFERENCES products(product_id),
+          REFERENCES products(product_id)
+          ON DELETE CASCADE,
 
         CONSTRAINT uq_cart_buyer_product
           UNIQUE (buyer_id, product_id)

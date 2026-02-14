@@ -18,6 +18,7 @@ export async function createOrderDiscountTable() {
         CONSTRAINT fk_od_discount
           FOREIGN KEY (discount_id)
           REFERENCES discount(discount_id)
+          ON DELETE CASCADE
       );
     `;
     console.log("DB order_discounts table created successfully");
