@@ -5,6 +5,7 @@ import cors from "cors";
 import dotenv from "dotenv"; //loads secret variables(passwords) from .env
 
 //routes
+import userRoutes from "./routes/userRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
@@ -38,6 +39,7 @@ app.get("/test", (req, res) => {
 });
 
 app.set("json spaces", 2);
+app.use("/api/users", userRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
