@@ -111,3 +111,45 @@ export const updateProduct = async (req, res) => {
     });
   }
 };
+
+//just updating the quantity when order is placed
+export const updateProductStock = async (req, res) => {
+  try {
+    const { productId } = req.params;
+    const { quantity } = req.body;
+
+    if (quantity == null || quantity < 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Quantity must be a non-negative number",
+      });
+    }
+
+    // Verify seller owns the product
+    const existing = await sql`
+      SELECT * FROM products WHERE product_id = ${productId} AND seller_id = ${req.user.user_id}
+    `;
+
+    if (existing.length === 0) {
+      return res.status(403).json({
+        success: false,
+        message: "You can only update stock for your own products",
+      });
+    }
+
+    const updated = await sql`
+      UPDATE products
+      SET quantity = ${quantity}
+      WHERE product_id = ${productId}
+      RETURNING *
+    `;
+
+    res.status(200).json({
+      success: true,
+      message: "Product stock updated successfully",
+      product: updated[0],
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
