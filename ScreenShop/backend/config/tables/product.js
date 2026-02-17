@@ -17,11 +17,13 @@ export async function createProductTable() {
 
         CONSTRAINT fk_product_seller
           FOREIGN KEY (seller_id)
-          REFERENCES sellers(seller_id),
+          REFERENCES sellers(seller_id)
+          ON DELETE CASCADE,
 
         CONSTRAINT fk_product_category
           FOREIGN KEY (category_id)
           REFERENCES product_category(category_id)
+          ON DELETE CASCADE
     );
     `;
         console.log("DB products table created successfully");

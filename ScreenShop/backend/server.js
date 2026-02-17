@@ -5,8 +5,11 @@ import cors from "cors";
 import dotenv from "dotenv"; //loads secret variables(passwords) from .env
 
 //routes
+import userRoutes from "./routes/userRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
+import orderRoutes from "./routes/orderRoutes.js";
+import cartRoutes from "./routes/cartRoutes.js";
 
 
 //import { sql } from "./config/db.js";
@@ -36,18 +39,20 @@ app.get("/test", (req, res) => {
 });
 
 app.set("json spaces", 2);
+app.use("/api/users", userRoutes);
 app.use("/api/products", productRoutes);
-//api/products diye start howa shob request productRoutes.js file handle korbe
+app.use("/api/cart", cartRoutes);
+app.use("/api/orders", orderRoutes);
 
 app.use("/api/auth", authRoutes);
 
 async function startServer() {
   try { 
-    await initDB();
-    console.log("Database Tables Initialized");
+    // await initDB();
+    // console.log("Database Tables Initialized");
 
-    await seed();
-    console.log("Database Seeded Successfully");
+    // await seed();
+    // console.log("Database Seeded Successfully");
   
     app.listen(PORT, () => {
       console.log(`Server is running on http://localhost:${PORT}`);
