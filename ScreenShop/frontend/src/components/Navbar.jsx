@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { FaUserCircle } from "react-icons/fa"; // profile icon
 import { signup, login } from "../api/auth.js";
+import { useNavigate } from "react-router-dom";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -9,6 +10,7 @@ export default function Navbar() {
   const [user, setUser] = useState(null);
   const [authMode, setAuthMode] = useState("login"); // 'login' or 'signup'
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Password visibility states
   const [showPassword, setShowPassword] = useState(false);
@@ -355,19 +357,28 @@ export default function Navbar() {
                     authMode === "signup" ? e.target[5].value : undefined, // Delivery address
                   role: "buyer", // Default role for signup
                 };
-                try {
-                  
+                try {         
                   const res =
                     authMode === "signup"
                       ? await signup(formData)
                       : await login(formData);
 
+                  const user = res.data.user;
                   localStorage.setItem("token", res.data.token);
-                  localStorage.setItem("user", JSON.stringify(res.data.user));
+                  localStorage.setItem("user", JSON.stringify(user));
 
                   //Update navbar state to show profile icon
-                  setUser(res.data.user);
+                  setUser(user);
                   setIsModalOpen(false);
+
+                  if (user.role === "admin") {
+                    navigate("/admin/dashboard"); // <-- admin page
+                  } else if (user.role === "seller") {
+                    navigate("/seller/home");
+                  } else {
+                    navigate("/"); // buyer homepage
+                  }
+
                 } catch (err) {
                   // --- Show error if login/signup fails ---
                   console.error(err.response?.data || err.message);
