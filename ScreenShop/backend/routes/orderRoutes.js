@@ -5,11 +5,11 @@ import authMiddleware from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.post("/", authMiddleware, placeOrder);
-router.get("/", authMiddleware, viewOrders);
-router.get("/my-orders", authMiddleware, getMyOrders);
+router.post("/", authMiddleware, placeOrder); // checked
+router.get("/", authMiddleware, viewOrders); // checked
+router.get("/my-orders", authMiddleware, getMyOrders); // checked
 
-router.patch("/:id/status", authMiddleware, updateOrderStatus);
-router.patch("/:id/cancel", authMiddleware, cancelOrder);
+router.patch("/:id/status", authMiddleware, updateOrderStatus); //checked
+router.patch("/:id/cancel", authMiddleware, cancelOrder); // checked
 
 export default router;

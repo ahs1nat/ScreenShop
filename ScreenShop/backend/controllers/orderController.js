@@ -1,114 +1,115 @@
 import { sql } from "../config/db.js";
 
 // Not integrated with auto stock reduction
-// export const placeOrder = async (req, res) => {
-//   try {
-//     const { total_amount } = req.body;
-//     const user_id = req.user.user_id;
 
-//     if (!total_amount) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "user_id and total_amount are required",
-//       });
-//     }
-
-//     const newOrder = await sql`
-//       INSERT INTO Orders (user_id, total_amount)
-//       VALUES (${user_id}, ${total_amount})
-//       RETURNING *
-//     `;
-
-//     res.status(201).json({
-//       success: true,
-//       data: newOrder[0],
-//     });
-//   } catch (error) {
-//     console.error("Error placing order:", error);
-//     res.status(500).json({
-//       success: false,
-//       message: "Server Error",
-//     });
-//   }
-// };
-
-
-// Integrated with auto stock reduction
 export const placeOrder = async (req, res) => {
   try {
-    const { total_price, items } = req.body; // items = [{ product_id, quantity }]
+    const { total_price } = req.body;
     const buyer_id = req.user.user_id;
 
-    // Validate request
-    if (!total_price || !items || !Array.isArray(items) || items.length === 0) {
+    if (!total_price) {
       return res.status(400).json({
         success: false,
-        message: "total_price and items are required",
+        message: "buyer_id and total_amount are required",
       });
     }
 
-    // Begin a transaction to ensure atomicity
-    await sql.begin(async (tx) => {
-      // Check stock for all items
-      for (const item of items) {
-        const product = await tx`
-          SELECT quantity, name FROM products WHERE product_id = ${item.product_id}
-        `;
-        if (product.length === 0) {
-          throw { status: 400, message: `Product ID ${item.product_id} not found` };
-        }
-        if (product[0].quantity < item.quantity) {
-          throw { status: 400, message: `Insufficient stock for product "${product[0].name}"` };
-        }
-      }
+    const newOrder = await sql`
+      INSERT INTO orders (buyer_id, total_price, status)
+      VALUES (${buyer_id}, ${total_price}, 'pending')
+      RETURNING *
+    `;
 
-      // Insert the order
-      const newOrder = await tx`
-        INSERT INTO orders (buyer_id, total_price, status)
-        VALUES (${buyer_id}, ${total_price}, 'pending')
-        RETURNING *
-      `;
-
-      const order_id = newOrder[0].order_id;
-
-      // Insert order items and reduce stock
-      for (const item of items) {
-        // Insert into order_items table (assuming it exists)
-        await tx`
-          INSERT INTO order_items (order_id, product_id, quantity)
-          VALUES (${order_id}, ${item.product_id}, ${item.quantity})
-        `;
-
-        // Reduce stock
-        await tx`
-          UPDATE products
-          SET quantity = quantity - ${item.quantity}
-          WHERE product_id = ${item.product_id}
-        `;
-      }
-
-      res.status(201).json({
-        success: true,
-        message: "Order placed successfully",
-        order: newOrder[0],
-      });
+    res.status(201).json({
+      success: true,
+      data: newOrder[0],
     });
   } catch (error) {
     console.error("Error placing order:", error);
-    // Handle custom errors from stock check
-    if (error.status) {
-      return res.status(error.status).json({
-        success: false,
-        message: error.message,
-      });
-    }
-
     res.status(500).json({
       success: false,
       message: "Server Error",
     });
   }
 };
+
+
+// Integrated with auto stock reduction
+// export const placeOrder = async (req, res) => {
+//   try {
+//     const { total_price, items } = req.body; // items = [{ product_id, quantity }]
+//     const buyer_id = req.user.user_id;
+
+//     // Validate request
+//     if (!total_price || !items || !Array.isArray(items) || items.length === 0) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "total_price and items are required",
+//       });
+//     }
+
+//     // Begin a transaction to ensure atomicity
+//     await sql.transaction(async (tx) => {
+//       // Check stock for all items
+//       for (const item of items) {
+//         const product = await tx`
+//           SELECT quantity, name FROM products WHERE product_id = ${item.product_id}
+//         `;
+//         if (product.length === 0) {
+//           throw { status: 400, message: `Product ID ${item.product_id} not found` };
+//         }
+//         if (product[0].quantity < item.quantity) {
+//           throw { status: 400, message: `Insufficient stock for product "${product[0].name}"` };
+//         }
+//       }
+
+//       // Insert the order
+//       const newOrder = await tx`
+//         INSERT INTO orders (buyer_id, total_price, status)
+//         VALUES (${buyer_id}, ${total_price}, 'pending')
+//         RETURNING *
+//       `;
+
+//       const order_id = newOrder[0].order_id;
+
+//       // Insert order items and reduce stock
+//       for (const item of items) {
+//         // Insert into order_items table (assuming it exists)
+//         await tx`
+//           INSERT INTO order_items (order_id, product_id, quantity)
+//           VALUES (${order_id}, ${item.product_id}, ${item.quantity})
+//         `;
+
+//         // Reduce stock
+//         await tx`
+//           UPDATE products
+//           SET quantity = quantity - ${item.quantity}
+//           WHERE product_id = ${item.product_id}
+//         `;
+//       }
+
+//       res.status(201).json({
+//         success: true,
+//         message: "Order placed successfully",
+//         order: newOrder[0],
+//       });
+//     });
+//   } catch (error) {
+//     console.error("Error placing order:", error);
+//     // Handle custom errors from stock check
+//     if (error.status) {
+//       return res.status(error.status).json({
+//         success: false,
+//         message: error.message,
+//       });
+//     }
+
+//     res.status(500).json({
+//       success: false,
+//       message: "Server Error",
+//     });
+//   }
+// };
 
 export const viewOrders = async (req, res) => {
   try {
@@ -164,7 +165,7 @@ export const viewOrders = async (req, res) => {
 
 export const updateOrderStatus = async (req, res) => {
   try {
-    const { order_id } = req.params; // renamed from id
+    const { id: order_id } = req.params; // renamed from id
     const { status } = req.body;
     const user = req.user;
 
@@ -222,7 +223,7 @@ export const updateOrderStatus = async (req, res) => {
         });
       }
 
-      if (order.buyer_id !== user.user_id) {
+      if (order.buyer_id !== user.buyer_id) {
         return res.status(403).json({
           success: false,
           message: "Unauthorized",
@@ -262,7 +263,7 @@ export const updateOrderStatus = async (req, res) => {
         });
       }
     }
-    
+
     else {
       return res.status(403).json({
         success: false,
@@ -295,8 +296,8 @@ export const updateOrderStatus = async (req, res) => {
 
 export const cancelOrder = async (req, res) => {
   try {
-    const { order_id } = req.params;
-    const user_id = req.user.user_id;
+    const { id: order_id } = req.params;
+    const user = req.user;
 
     const existingOrder = await sql`
       SELECT * FROM orders WHERE order_id = ${order_id}
@@ -311,7 +312,7 @@ export const cancelOrder = async (req, res) => {
 
     const order = existingOrder[0];
 
-    if (order.buyer_id !== req.user.user_id) {
+    if (order.buyer_id !== user.buyer_id) {
       return res.status(403).json({
         success: false,
         message: "You can only cancel your own orders",
@@ -352,7 +353,7 @@ export const getMyOrders = async (req, res) => {
 
     const orders = await sql`
       SELECT * FROM orders
-      WHERE buyer_id = ${req.user.user_id}
+      WHERE buyer_id = ${req.user.buyer_id}
       ORDER BY created_at DESC
     `;
 
