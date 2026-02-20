@@ -1,1 +1,1 @@
-select * from buyers;
+SELECT * from users;
