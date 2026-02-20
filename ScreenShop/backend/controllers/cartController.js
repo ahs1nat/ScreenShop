@@ -5,6 +5,14 @@ export const addToCart = async (req, res) => {
         const buyer_id = req.user.buyer_id;
         const { product_id, quantity } = req.body;
 
+        if (!buyer_id) {
+            console.error("User object is missing ID:", req.user);
+            return res.status(401).json({
+                success: false,
+                message: "User ID missing from token"
+            });
+        }
+
         if (!product_id || !quantity || quantity < 1) {
             return res.status(400).json({
                 success: false,
@@ -43,7 +51,7 @@ export const viewCart = async (req, res) => {
         ci.cartitem_id,
         ci.quantity,
         p.product_id,
-        p.product_name,
+        p.name,
         p.price
       FROM cart_items ci
       JOIN products p
@@ -69,32 +77,47 @@ export const updateCart = async (req, res) => {
     try {
         const buyer_id = req.user.buyer_id;
         const { itemId } = req.params;
-        const { quantity } = req.body;
+        const { quantity: newQuantity } = req.body; // Renamed for clarity
 
-        if (!quantity || quantity < 1) {
+        if (!newQuantity || newQuantity < 1) {
             return res.status(400).json({
                 success: false,
-                message: "Valid quantity required"
+                message: "Valid quantity required (minimum 1)"
             });
         }
 
-        const updated = await sql`
-      UPDATE cart_items
-      SET quantity = ${quantity}
-      WHERE cartitem_id = ${itemId}
-      AND buyer_id = ${buyer_id}
-      RETURNING *
-    `;
+        const existingItem = await sql`
+            SELECT quantity FROM cart_items 
+            WHERE cartitem_id = ${itemId} AND buyer_id = ${buyer_id}
+        `;
 
-        if (updated.length === 0) {
+        if (existingItem.length === 0) {
             return res.status(404).json({
                 success: false,
                 message: "Cart item not found"
             });
         }
 
+        const currentQuantity = existingItem[0].quantity;
+
+        if (newQuantity >= currentQuantity) {
+            return res.status(400).json({
+                success: false,
+                message: `You can only decrease the quantity. Current quantity is ${currentQuantity}.`
+            });
+        }
+
+        const updated = await sql`
+            UPDATE cart_items
+            SET quantity = ${newQuantity}
+            WHERE cartitem_id = ${itemId}
+            AND buyer_id = ${buyer_id}
+            RETURNING *
+        `;
+
         res.status(200).json({
             success: true,
+            message: "Quantity decreased successfully",
             data: updated[0]
         });
 
