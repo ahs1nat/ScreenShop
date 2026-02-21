@@ -5,6 +5,7 @@ import cors from "cors";
 import dotenv from "dotenv"; //loads secret variables(passwords) from .env
 
 //routes
+import adminRoutes from "./routes/adminRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
@@ -15,7 +16,7 @@ import cartRoutes from "./routes/cartRoutes.js";
 //import { sql } from "./config/db.js";
 
 import { initDB } from "./config/init.js";
-import { seed } from "./routes/seed.js";
+import { seed } from "./seeds/seed.js";
 
 dotenv.config();
 
@@ -38,7 +39,7 @@ app.get("/test", (req, res) => {
   res.send("Hello from " + PORT);
 });
 
-app.set("json spaces", 2);
+app.use("/api/admin", adminRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/cart", cartRoutes);

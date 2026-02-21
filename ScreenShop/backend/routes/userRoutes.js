@@ -2,8 +2,7 @@ import express from "express";
 import {
     getAllUsers,
     getUserById,
-    deleteUser,
-    updateUserRole,
+    deleteUser
 } from "../controllers/userController.js";
 
 import authMiddleware from "../middleware/authMiddleware.js";
@@ -15,6 +14,5 @@ const router = express.Router();
 router.get("/", authMiddleware, adminOnly, getAllUsers);
 router.get("/:id", authMiddleware, adminOnly, getUserById);
 router.delete("/:id", authMiddleware, adminOnly, deleteUser);
-router.put("/:id/role", authMiddleware, adminOnly, updateUserRole);
 
 export default router;

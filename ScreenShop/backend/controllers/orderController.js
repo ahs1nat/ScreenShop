@@ -5,7 +5,7 @@ import { sql } from "../config/db.js";
 export const placeOrder = async (req, res) => {
   try {
     const { total_price } = req.body;
-    const buyer_id = req.user.user_id;
+    const buyer_id = req.user.buyer_id;
 
     if (!total_price) {
       return res.status(400).json({
@@ -113,7 +113,7 @@ export const placeOrder = async (req, res) => {
 
 export const viewOrders = async (req, res) => {
   try {
-    const buyer_id = req.user.user_id;   // assuming token stores user_id
+    const buyer_id = req.user.user_id;
     const role = req.user.role;
     const { status } = req.query;
 
@@ -122,14 +122,24 @@ export const viewOrders = async (req, res) => {
     if (role === "admin") {
       if (status) {
         orders = await sql`
-          SELECT * FROM orders
-          WHERE status = ${status}
-          ORDER BY created_at DESC
+          SELECT 
+            o.*,
+            u.name AS buyer_name,
+            u.email AS buyer_email
+          FROM orders o
+          JOIN users u ON o.buyer_id = u.user_id
+          WHERE o.status = ${status}
+          ORDER BY o.created_at DESC
         `;
       } else {
         orders = await sql`
-          SELECT * FROM orders
-          ORDER BY created_at DESC
+          SELECT 
+            o.*,
+            u.name AS buyer_name,
+            u.email AS buyer_email
+          FROM orders o
+          JOIN users u ON o.buyer_id = u.user_id
+          ORDER BY o.created_at DESC
         `;
       }
     } else {
@@ -239,7 +249,7 @@ export const updateOrderStatus = async (req, res) => {
         SELECT DISTINCT oi.product_id
         FROM order_items oi
         JOIN products p ON oi.product_id = p.product_id
-        WHERE oi.order_id = ${order_id} AND p.seller_id = ${user.user_id}
+        WHERE oi.order_id = ${order_id} AND p.seller_id = ${user.seller_id}
       `;
 
       if (sellerProducts.length === 0) {

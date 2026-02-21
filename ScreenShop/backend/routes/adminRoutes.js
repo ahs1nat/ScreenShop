@@ -3,8 +3,12 @@ import authMiddleware from "../middleware/authMiddleware.js";
 import adminOnly from "../middleware/adminOnly.js";
 import {
   getAllStores,
+  getAllPendingStores,
   deleteStore,
+  approveProduct,
+  approveStore,
   getAllProducts,
+  getAllPendingProducts,
   deleteProduct,
   getCategories,
   addCategory,
@@ -18,16 +22,20 @@ import {
 
 const router = express.Router();
 
-router.get("/stores", authMiddleware, adminOnly, getAllStores);
+router.get("/stores", authMiddleware, adminOnly, getAllStores); // checked
+router.get("/stores/pending", authMiddleware, adminOnly, getAllPendingStores); // checked
 router.delete("/stores/:id", authMiddleware, adminOnly, deleteStore);
+router.patch("/:id/approve", authMiddleware, adminOnly, approveStore); //checked
 
-router.get("/products", authMiddleware, adminOnly, getAllProducts);
-router.delete("/products/:id", authMiddleware, adminOnly, deleteProduct);
+router.get("/products", authMiddleware, adminOnly, getAllProducts); // checked
+router.get("/products/pending", authMiddleware, adminOnly, getAllPendingProducts); // checked
+router.patch("/products/:productId/approve", authMiddleware, adminOnly, approveProduct); // checked
+router.delete("/products/:id", authMiddleware, adminOnly, deleteProduct); // unchecked, hope 
 
-router.get("/categories", authMiddleware, adminOnly, getCategories);
-router.post("/categories", authMiddleware, adminOnly, addCategory);
-router.put("/categories/:id", authMiddleware, adminOnly, editCategory);
-router.delete("/categories/:id", authMiddleware, adminOnly, deleteCategory);
+router.get("/categories", authMiddleware, adminOnly, getCategories); // checked
+router.post("/categories", authMiddleware, adminOnly, addCategory); // checked
+router.put("/categories/:id", authMiddleware, adminOnly, editCategory); // checked
+router.delete("/categories/:id", authMiddleware, adminOnly, deleteCategory); // checked
 
 router.get("/discounts", authMiddleware, adminOnly, getDiscounts);
 router.post("/discounts", authMiddleware, adminOnly, addDiscount);
