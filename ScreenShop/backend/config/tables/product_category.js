@@ -5,7 +5,7 @@ export async function createProductCategoryTable() {
         await sql`
     CREATE TABLE IF NOT EXISTS product_category (
     category_id SERIAL PRIMARY KEY,
-        name VARCHAR(100) NOT NULL
+        name VARCHAR(100) NOT NULL UNIQUE
     );
     `;
         console.log("DB product_category table created successfully");
