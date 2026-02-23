@@ -1,7 +1,7 @@
 // backend/seeds/seed.js
 import { sql } from "../config/db.js";
 import dotenv from "dotenv";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs"; //without this server isn't running
 
 dotenv.config();
 
@@ -142,4 +142,4 @@ export async function seed() {
 }
 
 // Actually run the seed
-seed();
+// seed();

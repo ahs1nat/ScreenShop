@@ -6,7 +6,6 @@ export const getAllProducts = async (req, res) => {
       SELECT p.*, c.name as category_name 
       FROM products p
       LEFT JOIN product_category c ON p.category_id = c.category_id
-      WHERE p.approved=false
       ORDER BY p.created_at DESC
     `;
     res.status(200).json({ success: true, data: products });
@@ -49,7 +48,7 @@ export const deleteProduct = async (req, res) => {
   try {
     const { productId } = req.params;
     const existing = await sql`
-      SELECT * FROM product WHERE product_id = ${productId} AND seller_id = ${req.user.user_id}
+      SELECT * FROM products WHERE product_id = ${productId} AND seller_id = ${req.user.user_id}
     `;
     if (existing.length === 0) {
       return res.status(403).json({
@@ -58,7 +57,7 @@ export const deleteProduct = async (req, res) => {
       });
     }
 
-    await sql`DELETE FROM product WHERE product_id = ${productId}`;
+    await sql`DELETE FROM products WHERE product_id = ${productId}`;
 
     res.status(200).json({
       success: true,
@@ -75,7 +74,7 @@ export const updateProduct = async (req, res) => {
     const { name, description, price, quantity, category_id, image_url } =
       req.body;
     const existing = await sql`
-      SELECT * FROM product WHERE product_id = ${productId} AND seller_id = ${req.user.user_id}
+      SELECT * FROM products WHERE product_id = ${productId} AND seller_id = ${req.user.user_id}
     `;
 
     if (existing.length === 0) {
