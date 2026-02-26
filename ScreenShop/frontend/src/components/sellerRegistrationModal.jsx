@@ -126,7 +126,7 @@ export default function SellerRegistrationModal({ isOpen, onClose }) {
 
               <button
                 type="submit"
-                className="!btn !btn-primary w-full mt-4 !text-white"
+                className="btn btn-primary w-full mt-4"
               >
                 Submit for Approval
               </button>
@@ -152,7 +152,7 @@ export default function SellerRegistrationModal({ isOpen, onClose }) {
               Seller registration form submitted for approval
             </h3>
 
-            <button onClick={onClose} className="!btn !btn-primary mt-6">
+            <button onClick={onClose} className="btn btn-primary mt-6">
               Close
             </button>
           </div>
