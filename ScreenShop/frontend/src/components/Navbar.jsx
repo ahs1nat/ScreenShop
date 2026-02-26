@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FaUserCircle } from "react-icons/fa"; // profile icon
 import { signup, login } from "../api/auth.js";
-import { useNavigate } from "react-router-dom";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -11,18 +10,28 @@ export default function Navbar() {
   const [authMode, setAuthMode] = useState("login"); // 'login' or 'signup'
   const location = useLocation();
   const navigate = useNavigate();
+  const [isDark, setIsDark] = useState(() => {
+    return localStorage.getItem("theme") === "dark";
+  });
 
-  // Password visibility states
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const toggleTheme = () => {
+    const newTheme = isDark ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", newTheme);
+    localStorage.setItem("theme", newTheme);
+    setIsDark(!isDark);
+  };
 
   useEffect(() => {
-    // Check if user info exists in localStorage
+    const savedTheme = localStorage.getItem("theme") || "light";
+    document.documentElement.setAttribute("data-theme", savedTheme);
+    setIsDark(savedTheme === "dark");
+  }, []);
+
+  useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) setUser(JSON.parse(storedUser));
   }, []);
 
-  // Handle scroll for navbar shadow
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
@@ -30,52 +39,6 @@ export default function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  // Reset password visibility when switching modes or closing modal
-  useEffect(() => {
-    setShowPassword(false);
-    setShowConfirmPassword(false);
-  }, [authMode, isModalOpen]);
-
-  // Icons for Password Toggle
-  const EyeIcon = () => (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      strokeWidth={1.5}
-      stroke="currentColor"
-      className="w-5 h-5"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M2.036 12.322a1.012 1.012 0 010-.644C3.67 8.5 7.652 6 12 6c4.348 0 8.33 2.5 9.964 5.678a1.012 1.012 0 010 .644C20.33 15.5 16.348 18 12 18c-4.348 0-8.33-2.5-9.964-5.678z"
-      />
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-      />
-    </svg>
-  );
-
-  const EyeOffIcon = () => (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      strokeWidth={1.5}
-      stroke="currentColor"
-      className="w-5 h-5"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"
-      />
-    </svg>
-  );
 
   // Close modal on 'Esc' key
   useEffect(() => {
@@ -96,7 +59,10 @@ export default function Navbar() {
         >
           {/* Logo */}
           <div className="flex-none">
-            <Link to="/" className="text-xl font-bold">
+            <Link
+              to="/"
+              className="text-xl font-bold normal-case no-underline text-base-content"
+            >
               ScreenShop
             </Link>
           </div>
@@ -106,10 +72,10 @@ export default function Navbar() {
             <div className="flex gap-4">
               <Link
                 to="/"
-                className={`btn btn-link text-base ${
+                className={`px-3 py-3 text-base font-medium text-base-content hover:text-primary transition-colors ${
                   location.pathname === "/"
-                    ? "underline font-semibold"
-                    : "no-underline"
+                    ? "underline font-semibold text-primary"
+                    : ""
                 }`}
               >
                 Home
@@ -120,7 +86,7 @@ export default function Navbar() {
                 <div
                   tabIndex={0}
                   role="button"
-                  className={`btn btn-link text-base text-base-content no-underline flex items-center gap-1`}
+                  className={`px-3 py-3 text-base font-medium text-base-content hover:text-primary transition-colors flex items-center gap-1 cursor-pointer`}
                 >
                   Products
                   <svg
@@ -163,20 +129,20 @@ export default function Navbar() {
 
               <Link
                 to="/about"
-                className={`btn btn-link text-base ${
+                className={`px-3 py-3 text-base font-medium text-base-content hover:text-primary transition-colors ${
                   location.pathname === "/about"
-                    ? "underline font-semibold"
-                    : "no-underline"
+                    ? "underline font-semibold text-primary"
+                    : ""
                 }`}
               >
                 About
               </Link>
               <Link
                 to="/contact"
-                className={`btn btn-link text-base ${
+                className={`px-3 py-3 text-base font-medium text-base-content hover:text-primary transition-colors ${
                   location.pathname === "/contact"
-                    ? "underline font-semibold"
-                    : "no-underline"
+                    ? "underline font-semibold text-primary"
+                    : ""
                 }`}
               >
                 Contact
@@ -207,7 +173,46 @@ export default function Navbar() {
                 />
               </svg>
             </div>
-
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="btn btn-ghost btn-sm btn-circle"
+              title="Toggle theme"
+            >
+              {isDark ? (
+                // Sun icon
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"
+                  />
+                </svg>
+              ) : (
+                // Moon icon
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"
+                  />
+                </svg>
+              )}
+            </button>
             {/* Right Side: Join Now OR Profile */}
             {user ? (
               <div className="dropdown dropdown-end">
@@ -218,6 +223,11 @@ export default function Navbar() {
                   tabIndex={0}
                   className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52"
                 >
+                  {user?.role === "admin" && (
+                    <li>
+                      <Link to="/admin/dashboard">Admin Dashboard</Link>
+                    </li>
+                  )}
                   <li>
                     <Link to="/profile">Edit Profile</Link>
                   </li>
@@ -247,7 +257,7 @@ export default function Navbar() {
                   setAuthMode("signup");
                   setIsModalOpen(true);
                 }}
-                className="!btn !btn-primary"
+                className="btn btn-sm btn-primary"
               >
                 Join Now
               </button>
@@ -357,7 +367,7 @@ export default function Navbar() {
                     authMode === "signup" ? e.target[5].value : undefined, // Delivery address
                   role: "buyer", // Default role for signup
                 };
-                try {         
+                try {
                   const res =
                     authMode === "signup"
                       ? await signup(formData)
@@ -378,7 +388,6 @@ export default function Navbar() {
                   } else {
                     navigate("/"); // buyer homepage
                   }
-
                 } catch (err) {
                   // --- Show error if login/signup fails ---
                   console.error(err.response?.data || err.message);
@@ -452,10 +461,7 @@ export default function Navbar() {
               )}
 
               {/* Submit Button */}
-              <button
-                type="submit"
-                className="btn btn-primary w-full mt-4 !text-white !bg-primary"
-              >
+              <button type="submit" className="btn btn-primary w-full mt-4">
                 {authMode === "login" ? "Log In" : "Create an account"}
               </button>
 
