@@ -1,4 +1,4 @@
-import { neon } from "@neondatabase/serverless";
+import { neon, Pool } from "@neondatabase/serverless";
 import dotenv from "dotenv";
 
 //reads .env file and puts the variables into process.env
@@ -14,3 +14,4 @@ if (!process.env.DATABASE_URL) {
 
 //neon() returns a sql function which is used to run sql queries
 export const sql = neon(process.env.DATABASE_URL);
+export const pool = new Pool({ connectionString: process.env.DATABASE_URL }); // only used where transactions are needed

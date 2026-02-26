@@ -7,7 +7,7 @@ export async function createOrdersTable() {
     order_id SERIAL PRIMARY KEY,
         buyer_id INT NOT NULL,
         status VARCHAR(20) NOT NULL
-          CHECK (status IN ('pending', 'processing', 'shipped', 'delivered', 'cancelled')),
+          CHECK (status IN ('pending', 'confirmed', 'shipped', 'delivered', 'cancelled')),
         total_price DECIMAL(10,2) NOT NULL,
         created_at TIMESTAMP DEFAULT NOW(),
 
