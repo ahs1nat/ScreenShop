@@ -12,6 +12,7 @@ import authRoutes from "./routes/authRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
 import sellerRoutes from "./routes/sellerRoutes.js";
+import buyerRoutes from "./routes/buyerRoutes.js";
 
 
 //import { sql } from "./config/db.js";
@@ -42,6 +43,7 @@ app.get("/test", (req, res) => {
 
 app.use("/api/admin", adminRoutes);
 app.use("/api/seller", sellerRoutes);
+app.use("/api/buyer", buyerRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/cart", cartRoutes);

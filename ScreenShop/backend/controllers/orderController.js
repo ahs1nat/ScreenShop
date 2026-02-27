@@ -398,7 +398,7 @@ import { pool } from "../config/db.js";
  * Everything runs inside a single transaction for atomicity.
  */
 export const placeOrder = async (req, res) => {
-  const buyer_id = req.user.buyer_id;
+  const buyer_id = req.user.user_id;
   const client = await pool.connect(); // check out a dedicated connection
   try {
     let order;
@@ -532,7 +532,7 @@ export const placeOrder = async (req, res) => {
 export const viewOrders = async (req, res) => {
   try {
     // FIX: was incorrectly using req.user.user_id for the buyer branch
-    const buyer_id = req.user.buyer_id;
+    const buyer_id = req.user.user_id;
     const role = req.user.role;
     const { status } = req.query;
 
@@ -615,7 +615,8 @@ export const updateOrderStatus = async (req, res) => {
     if (user.role === "admin") {
       // Admin can set any allowed status — no extra checks
     } else if (user.role === "buyer") {
-      if (order.buyer_id !== user.buyer_id) {
+      if (order.buyer_id !== user.user_id) //replaced buyer_id with user_id
+      {
         return res.status(403).json({ success: false, message: "Unauthorized" });
       }
       if (status !== "cancelled" || !["pending", "confirmed"].includes(currentStatus)) {
@@ -624,12 +625,13 @@ export const updateOrderStatus = async (req, res) => {
           message: "Buyers can only cancel orders that are pending or confirmed",
         });
       }
-    } else if (user.role === "seller") {
+    } else if (user.role === "seller") //replaced selle rid with user id
+    {
       const sellerProducts = await sql`
         SELECT DISTINCT oi.product_id
         FROM order_items oi
         JOIN products p ON oi.product_id = p.product_id
-        WHERE oi.order_id = ${order_id} AND p.seller_id = ${user.seller_id}
+        WHERE oi.order_id = ${order_id} AND p.seller_id = ${user.user_id} 
       `;
 
       if (sellerProducts.length === 0) {
@@ -729,7 +731,8 @@ export const cancelOrder = async (req, res) => {
 
     const order = existingOrder[0];
 
-    if (order.buyer_id !== user.buyer_id) {
+    if (order.buyer_id !== user.user_id) //replaced buyer id with user id
+    {
       return res.status(403).json({
         success: false,
         message: "You can only cancel your own orders",
@@ -809,5 +812,32 @@ export const getMyOrders = async (req, res) => {
   } catch (error) {
     console.error("Error fetching user orders:", error);
     res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
+
+
+export const getOrderItems = async (req, res) => {
+  try {
+    const { id: order_id } = req.params;
+    const buyer_id = req.user.user_id;
+
+    // Verify this order belongs to the buyer
+    const order = await sql`
+      SELECT * FROM orders WHERE order_id = ${order_id} AND buyer_id = ${buyer_id}
+    `;
+    if (order.length === 0) {
+      return res.status(403).json({ success: false, message: "Unauthorized" });
+    }
+
+    const items = await sql`
+      SELECT oi.*, p.name, p.image_url
+      FROM order_items oi
+      JOIN products p ON oi.product_id = p.product_id
+      WHERE oi.order_id = ${order_id}
+    `;
+
+    res.json({ success: true, data: items });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 };

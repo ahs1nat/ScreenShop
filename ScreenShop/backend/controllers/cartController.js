@@ -2,7 +2,8 @@ import { sql } from "../config/db.js";
 
 export const addToCart = async (req, res) => {
     try {
-        const buyer_id = req.user.buyer_id;
+        //const buyer_id = req.user.buyer_id;
+        const buyer_id = req.user.user_id;
         const { product_id, quantity } = req.body;
 
         if (!buyer_id) {
@@ -44,7 +45,7 @@ export const addToCart = async (req, res) => {
 
 export const viewCart = async (req, res) => {
     try {
-        const buyer_id = req.user.buyer_id;
+        const buyer_id = req.user.user_id;
 
         const items = await sql`
       SELECT 
@@ -75,7 +76,7 @@ export const viewCart = async (req, res) => {
 
 export const updateCart = async (req, res) => {
     try {
-        const buyer_id = req.user.buyer_id;
+        const buyer_id = req.user.user_id;
         const { itemId } = req.params;
         const { quantity: newQuantity } = req.body; // Renamed for clarity
 
@@ -100,12 +101,12 @@ export const updateCart = async (req, res) => {
 
         const currentQuantity = existingItem[0].quantity;
 
-        if (newQuantity >= currentQuantity) {
-            return res.status(400).json({
-                success: false,
-                message: `You can only decrease the quantity. Current quantity is ${currentQuantity}.`
-            });
-        }
+        // if (newQuantity >= currentQuantity) {
+        //     return res.status(400).json({
+        //         success: false,
+        //         message: `You can only decrease the quantity. Current quantity is ${currentQuantity}.`
+        //     });
+        // }
 
         const updated = await sql`
             UPDATE cart_items
@@ -132,7 +133,7 @@ export const updateCart = async (req, res) => {
 
 export const removeCartItem = async (req, res) => {
     try {
-        const buyer_id = req.user.buyer_id;
+        const buyer_id = req.user.user_id;
         const { itemId } = req.params;
 
         const deleted = await sql`

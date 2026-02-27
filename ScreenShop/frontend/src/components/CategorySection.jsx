@@ -10,20 +10,14 @@ const categories = [
 
 export default function CategorySection() {
   return (
-    <section className="w-full py-12">
-      <h2 className="text-4xl font-bold mb-8">Browse by Category</h2>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+    <section className="w-full py-8">
+      <h2 className="text-2xl font-bold mb-6">Browse by Category</h2>
+      <div className="flex flex-wrap gap-3">
         {categories.map((cat) => (
-          <Link
-            to={cat.link}
-            key={cat.name}
-            className="no-underline"
-          >
-            <div className="card bg-base-100 shadow-md hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer h-full">
-              <div className="card-body items-center text-center py-6">
-                <div className="text-5xl mb-3">{cat.icon}</div>
-                <h3 className="card-title text-base">{cat.name}</h3>
-              </div>
+          <Link to={cat.link} key={cat.name} className="no-underline">
+            <div className="flex items-center gap-2 px-5 py-3 bg-base-200 hover:bg-primary hover:text-primary-content rounded-full shadow-sm transition-all duration-200 cursor-pointer">
+              <span className="text-xl">{cat.icon}</span>
+              <span className="font-medium text-sm">{cat.name}</span>
             </div>
           </Link>
         ))}
