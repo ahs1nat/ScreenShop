@@ -23,7 +23,6 @@ import {
   deleteDiscount,
 } from "../controllers/adminController.js";
 
-
 const router = express.Router();
 
 router.get("/stats", authMiddleware, adminOnly, getAdminStats);

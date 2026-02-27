@@ -1,7 +1,19 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { FaUserCircle } from "react-icons/fa"; // profile icon
+import { FaUserCircle } from "react-icons/fa";
 import { signup, login } from "../api/auth.js";
+import {
+  LayoutDashboard,
+  UserCircle,
+  ShoppingCart,
+  Package,
+  Star,
+  MessageCircle,
+  LogOut,
+  Store,
+  Tag,
+  Percent,
+} from "lucide-react";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -224,29 +236,109 @@ export default function Navbar() {
                   className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52"
                 >
                   {user?.role === "admin" && (
-                    <li>
-                      <Link to="/admin/dashboard">Admin Dashboard</Link>
-                    </li>
+                    <>
+                      <li>
+                        <Link to="/admin/dashboard">
+                          <LayoutDashboard size={16} /> Dashboard
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="/admin/stores">
+                          <Store size={16} /> Stores
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="/admin/products">
+                          <Package size={16} /> Products
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="/admin/categories">
+                          <Tag size={16} /> Categories
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="/admin/discounts">
+                          <Percent size={16} /> Discounts
+                        </Link>
+                      </li>
+                    </>
                   )}
-                  <li>
-                    <Link to="/profile">Edit Profile</Link>
-                  </li>
-                  <li>
-                    <Link to="/cart">View Cart</Link>
-                  </li>
-                  <li>
-                    <Link to="/orders">Orders</Link>
-                  </li>
+
+                  {user?.role === "seller" && (
+                    <>
+                      <li>
+                        <Link to="/seller/dashboard">
+                          <LayoutDashboard size={16} /> Dashboard
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="/seller/products">
+                          <Package size={16} /> Products
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="/seller/orders">
+                          <ShoppingCart size={16} /> Orders
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="/seller/questions">
+                          <MessageCircle size={16} /> Questions
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="/seller/profile">
+                          <Store size={16} /> Store Profile
+                        </Link>
+                      </li>
+                    </>
+                  )}
+
+                  {/* Buyer */}
+                  {user?.role === "buyer" && (
+                    <>
+                      <li>
+                        <Link to="/buyer/profile">
+                          <UserCircle size={16} /> Profile
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="/buyer/cart">
+                          <ShoppingCart size={16} /> Cart
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="/buyer/orders">
+                          <Package size={16} /> Orders
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="/buyer/reviews">
+                          <Star size={16} /> Reviews
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="/buyer/questions">
+                          <MessageCircle size={16} /> Questions
+                        </Link>
+                      </li>
+                    </>
+                  )}
+
+                  <div className="divider my-1"></div>
+
                   <li>
                     <button
+                      className="text-error"
                       onClick={() => {
                         localStorage.removeItem("token");
                         localStorage.removeItem("user");
                         setUser(null);
-                        window.location.reload(); //refresh page
+                        window.location.reload();
                       }}
                     >
-                      Logout
+                      <LogOut size={16} /> Logout
                     </button>
                   </li>
                 </ul>
@@ -384,7 +476,7 @@ export default function Navbar() {
                   if (user.role === "admin") {
                     navigate("/admin/dashboard"); // <-- admin page
                   } else if (user.role === "seller") {
-                    navigate("/seller/home");
+                    navigate("/seller/dashboard");
                   } else {
                     navigate("/"); // buyer homepage
                   }
