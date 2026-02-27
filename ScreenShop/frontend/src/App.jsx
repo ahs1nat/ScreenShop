@@ -9,6 +9,11 @@ import AdminProducts from "./pages/admin/AdminProducts.jsx";
 import AdminCategories from "./pages/admin/AdminCategories.jsx";
 import AdminDiscounts from "./pages/admin/AdminDiscounts.jsx";
 
+import SellerLayout from "./pages/seller/SellerLayout.jsx";
+import PrivateSellerRoute from "./pages/seller/PrivateSellerRoute.jsx";
+import SellerDashboard from "./pages/seller/SellerDashboard.jsx";
+import SellerProducts from "./pages/seller/SellerProducts.jsx";
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -55,8 +60,6 @@ export default function App() {
             </div>
           }
         />
-
-        {/* Admin Routes */}
         <Route
           path="/admin"
           element={
@@ -70,6 +73,17 @@ export default function App() {
           <Route path="products" element={<AdminProducts />} />
           <Route path="categories" element={<AdminCategories />} />
           <Route path="discounts" element={<AdminDiscounts />} />
+        </Route>
+        <Route
+          path="/seller"
+          element={
+            <PrivateSellerRoute>
+              <SellerLayout />
+            </PrivateSellerRoute>
+          }
+        >
+          <Route path="dashboard" element={<SellerDashboard />} />
+          <Route path="products" element={<SellerProducts />} />
         </Route>
       </Routes>
     </BrowserRouter>

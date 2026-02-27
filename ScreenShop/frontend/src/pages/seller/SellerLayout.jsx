@@ -1,28 +1,28 @@
 import { NavLink, Outlet } from "react-router-dom";
 import {
   LayoutDashboard,
-  Store,
   Package,
-  Tag,
-  Percent,
+  ShoppingCart,
+  Store,
   LogOut,
+  MessageCircle,
   ExternalLink,
 } from "lucide-react";
 
-export default function AdminLayout() {
+export default function SellerLayout() {
   const menuItems = [
-    { name: "Dashboard", path: "/admin/dashboard", icon: <LayoutDashboard size={18} /> },
-    { name: "Stores", path: "/admin/stores", icon: <Store size={18} /> },
-    { name: "Products", path: "/admin/products", icon: <Package size={18} /> },
-    { name: "Categories", path: "/admin/categories", icon: <Tag size={18} /> },
-    { name: "Discounts", path: "/admin/discounts", icon: <Percent size={18} /> },
+    { name: "Dashboard", path: "/seller/dashboard", icon: <LayoutDashboard size={18} /> },
+    { name: "Products", path: "/seller/products", icon: <Package size={18} /> },
+    { name: "Orders", path: "/seller/orders", icon: <ShoppingCart size={18} /> },
+    { name: "Store Profile", path: "/seller/profile", icon: <Store size={18} /> },
+    { name: "Questions", path: "/seller/questions", icon: <MessageCircle size={18} /> },
   ];
 
   return (
     <div className="flex h-screen">
       <aside className="w-64 bg-base-200 flex flex-col justify-between p-4">
         <div>
-          <h1 className="text-xl font-bold mb-8 px-2">Admin Panel</h1>
+          <h1 className="text-xl font-bold mb-8 px-2">Seller Panel</h1>
           <ul className="menu menu-vertical w-full gap-1">
             {menuItems.map((item) => (
               <li key={item.path}>
