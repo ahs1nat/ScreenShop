@@ -13,7 +13,7 @@ import orderRoutes from "./routes/orderRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
 import sellerRoutes from "./routes/sellerRoutes.js";
 import buyerRoutes from "./routes/buyerRoutes.js";
-
+import questionRoutes from "./routes/questionRoutes.js";
 
 //import { sql } from "./config/db.js";
 
@@ -48,6 +48,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/questions", questionRoutes);
 
 app.use("/api/auth", authRoutes);
 
