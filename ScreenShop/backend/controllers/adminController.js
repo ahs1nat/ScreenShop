@@ -47,6 +47,7 @@ export const getTopSellers = async (req, res) => {
       ORDER BY total_revenue DESC, total_orders DESC, u.created_at ASC
       LIMIT 5
     `;
+    //coalesce means "use the 1st non-null value"
 
     res.json({ success: true, topSellers });
   } catch (error) {
