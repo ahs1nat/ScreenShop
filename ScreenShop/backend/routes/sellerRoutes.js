@@ -15,6 +15,9 @@ const router = express.Router();
 
 router.get("/stats", authMiddleware, sellerOnly, getSellerStats);
 
+// Reuse admin categories endpoint for dropdown, changed place for bug fix
+router.get("/categories", authMiddleware, sellerOnly, getCategories);
+
 router.get("/products", authMiddleware, sellerOnly, getSellerProducts);
 router.post("/products", authMiddleware, sellerOnly, createSellerProduct);
 router.put(
@@ -35,8 +38,5 @@ router.put(
   sellerOnly,
   updateProductStock,
 );
-
-// Reuse admin categories endpoint for dropdown
-router.get("/categories", authMiddleware, sellerOnly, getCategories);
 
 export default router;

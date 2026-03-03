@@ -20,6 +20,7 @@ export default function Navbar() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [authMode, setAuthMode] = useState("login"); // 'login' or 'signup'
+  const [categories, setCategories] = useState([]);
   const location = useLocation();
   const navigate = useNavigate();
   const [isDark, setIsDark] = useState(() => {
@@ -42,6 +43,19 @@ export default function Navbar() {
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) setUser(JSON.parse(storedUser));
+  }, []);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch("/api/products/categories");
+        const data = await res.json();
+        if (data.success && Array.isArray(data.categories)) setCategories(data.categories);
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+      }
+    };
+    fetchCategories();
   }, []);
 
   useEffect(() => {
@@ -124,18 +138,17 @@ export default function Navbar() {
                   <li>
                     <Link to="/products">All Products</Link>
                   </li>
-                  <li>
-                    <Link to="/products?category=electronics">Electronics</Link>
-                  </li>
-                  <li>
-                    <Link to="/products?category=toys">Toys</Link>
-                  </li>
-                  <li>
-                    <Link to="/products?category=stationary">Stationary</Link>
-                  </li>
-                  <li>
-                    <Link to="/products?category=fashion">Fashion</Link>
-                  </li>
+                  {categories.map((cat) => (
+                    <li key={cat.category_id}>
+                      <Link
+                        to={`/products?category=${encodeURIComponent(
+                          cat.name.toLowerCase()
+                        )}`}
+                      >
+                        {cat.name}
+                      </Link>
+                    </li>
+                  ))}
                 </ul>
               </div>
 
