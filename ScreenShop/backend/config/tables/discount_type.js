@@ -5,7 +5,7 @@ export async function createDiscountTypeTable() {
         await sql`
     CREATE TABLE IF NOT EXISTS discount_type (
     type_id SERIAL PRIMARY KEY,
-        type_name VARCHAR(100) NOT NULL,
+        type_name VARCHAR(100) NOT NULL UNIQUE,
         description TEXT
     );
     `;

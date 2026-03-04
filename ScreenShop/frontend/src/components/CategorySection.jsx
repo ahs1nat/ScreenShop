@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 const categories = [
   { name: "Electronics", icon: "📱", link: "/products?category=electronics" },
   { name: "Toys", icon: "🧸", link: "/products?category=toys" },
-  { name: "Stationery", icon: "✏️", link: "/products?category=stationery" },
+  { name: "Stationary", icon: "✏️", link: "/products?category=stationary" },
   { name: "Fashion", icon: "👔", link: "/products?category=fashion" },
   { name: "Books", icon: "📚", link: "/products?category=books" },
 ];

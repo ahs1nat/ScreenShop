@@ -47,12 +47,14 @@ export default function ProductsPage() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const [offset, setOffset] = useState(0);
+  // const [offset, setOffset] = useState(0); // previous
   const observerRef = useRef(null);
   const isFetching = useRef(false);
 
   const sort = searchParams.get("sort") || "new";
   const category = searchParams.get("category") || "";
+
+  const offsetRef = useRef(0); // march 3
 
   const fetchProducts = useCallback(
     async (reset = false) => {
@@ -60,7 +62,8 @@ export default function ProductsPage() {
       isFetching.current = true;
       setLoading(true);
 
-      const currentOffset = reset ? 0 : offset;
+      const currentOffset = reset ? 0 : offsetRef.current; // march 3
+      // const currentOffset = reset ? 0 : offset; // previous
 
       try {
         const params = new URLSearchParams();
@@ -75,7 +78,8 @@ export default function ProductsPage() {
         if (data.success) {
           setProducts((prev) => (reset ? data.data : [...prev, ...data.data]));
           setHasMore(data.data.length === LIMIT);
-          setOffset(currentOffset + data.data.length);
+           offsetRef.current = currentOffset + data.data.length; // march 3
+          // setOffset(currentOffset + data.data.length); // previous
         }
       } catch (err) {
         console.error(err);
@@ -84,13 +88,15 @@ export default function ProductsPage() {
         isFetching.current = false;
       }
     },
-    [sort, category, offset],
+    [sort, category], // march 3
+    // [sort, category, offset], // previous
   );
 
   // Reset and refetch when filters change
   useEffect(() => {
     setProducts([]);
-    setOffset(0);
+    offsetRef.current = 0; // march 3
+    // setOffset(0); // previous
     setHasMore(true);
     isFetching.current = false;
     fetchProducts(true);
